@@ -7,7 +7,7 @@ SoundFile lose;
 PImage efek;
 PImage bg;
 PImage lifebar;
-PImage apple;
+PImage rocket;
 PImage bgGameover;
 PImage bgWin;
 PImage button;
@@ -16,8 +16,8 @@ boolean game_over=false; //game over jika kondisinya true
 boolean menu=true; //halaman menu awal (game mulai saat kondisinya false)
 Player basket;  //Declares an object of the type Player
 Lifebar life;  //Declares an object of the type Player
-Fruit apples[];  //Kita butuh beberapa apel. [] menunjukkan bahwa kita menggunakan array objek.
-int apple_no= 4;    //Jumlah apel yang tampil dilayar
+Fruit rockets[];  //Kita butuh beberapa apel. [] menunjukkan bahwa kita menggunakan array objek.
+int rocket_no= 4;    //Jumlah apel yang tampil dilayar
 int score= 0;
 int lifeScore= 400; //lebar lifebar
 
@@ -51,14 +51,14 @@ class Fruit {
     posx=(int)random(50, width-50);
     posy=0;
     rad=20;
-    speed=(int)random(3, 6);
+    speed=(int)random(2, 5);
     c=color(180, 0, 0);
   }
   void display()
   {
     //fill(c);
     //ellipse(posx, posy, rad, rad);
-    image(apple, posx, posy, rad, rad);
+    image(rocket, posx, posy, rad, rad);
   }
   void update_pos()
   {
@@ -69,7 +69,7 @@ class Fruit {
     if (posy>=height)  //Cek jika apel keluar dari layar, setel ulang posisinya dan berikan kecepatan baru.
     {
       reset_pos();
-      lifeScore-=20; //Mengurangi lifeScore saat apple miss
+      lifeScore-=20; //Mengurangi lifeScore saat rocket miss
     }
   }
   void reset_pos()
@@ -103,11 +103,11 @@ void setup()
   bgGameover = loadImage("gameover.png");
   bgWin = loadImage("win.jpg");
   lifebar = loadImage("lifebar.png");
-  apple = loadImage("apple.png");
+  rocket = loadImage("rocket.png");
   efek = loadImage("efek.png");
   button= loadImage("start.png");
   // Load the sound file
-  music = new SoundFile(this, "Senbonzakura - Lindsey Stirling.mp3");
+  music = new SoundFile(this, "Old Friends.mp3");
   lose = new SoundFile(this, "failsound.mp3");
   hit = new SoundFile(this, "hit.wav");
   
@@ -118,10 +118,10 @@ void setup()
   textFont(font, 16);
   basket=new Player();  //Initialize our object.
   life = new Lifebar();
-  apples=new Fruit[apple_no];  
-  for (int i=0;i<apple_no;i++)  //Initialize each apple.
+  rockets=new Fruit[rocket_no];  
+  for (int i=0;i<rocket_no;i++)  //Initialize each rocket.
   {
-    apples[i]=new Fruit();
+    rockets[i]=new Fruit();
   }
 }
 
@@ -136,12 +136,12 @@ void draw()
     if (!game_over && music.isPlaying()){
       life.display();              //Displays the lifebar.
       basket.display();              //Displays the basket.
-      for (int i=0;i<apple_no;++i)   //Untuk setiap apel yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
+      for (int i=0;i<rocket_no;++i)   //Untuk setiap apel yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
         {
-        apples[i].display();
-        apples[i].update_pos();
-        apples[i].check_bounds();
-        check_collision(apples[i]);
+        rockets[i].display();
+        rockets[i].update_pos();
+        rockets[i].check_bounds();
+        check_collision(rockets[i]);
         }
       score_display();
       lifeScore_display();
@@ -161,9 +161,9 @@ void menu(){
   //jika mouse click pada area tombol button
   if(mouseX>=300 && mouseX<=300+200 && mouseY>=195&&mouseY<=195+60 && mousePressed){
       image(button, 270, 185,240,80);
-      //reset posisi semua apple
-      for (int i=0;i<apple_no;++i){
-        apples[i].reset_pos();
+      //reset posisi semua rocket
+      for (int i=0;i<rocket_no;++i){
+        rockets[i].reset_pos();
       }
       lifeScore=400; //reset lifeScore
       score = 0; //reset score point
@@ -197,14 +197,14 @@ void gameWin(){
     }
 }
 
-void check_collision(Fruit temp_apple) 
+void check_collision(Fruit temp_rocket) 
 {
-  //cek jika apple ditangkap player
-  if (temp_apple.posx>basket.posx && temp_apple.posx < basket.posx+basket.w && temp_apple.posy>basket.posy-15 && temp_apple.posy<basket.posy-basket.h/2+30)  
+  //cek jika rocket ditangkap player
+  if (temp_rocket.posx>basket.posx && temp_rocket.posx < basket.posx+basket.w && temp_rocket.posy>basket.posy-15 && temp_rocket.posy<basket.posy-basket.h/2+30)  
   {
-    image(efek, temp_apple.posx-25, temp_apple.posy-35, 70, 70);
+    image(efek, temp_rocket.posx-25, temp_rocket.posy-35, 70, 70);
     hit.play();
-    temp_apple.reset_pos();
+    temp_rocket.reset_pos();
     score = score +1; //tambah point
     if(lifeScore>0 && lifeScore<400){
     lifeScore = lifeScore +5; //tambah lifescore
@@ -217,7 +217,7 @@ void score_display() //menampilkan score
   fill(#FAFAFA);
   textAlign(LEFT);
   textSize(18);
-  text("Apple Point : "+score, 5, height-5);
+  text("rocket Point : "+score, 5, height-5);
   noFill();
 }
 void lifeScore_display() //menampilkan lifescore
