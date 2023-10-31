@@ -16,8 +16,8 @@ boolean game_over=false; //game over jika kondisinya true
 boolean menu=true; //halaman menu awal (game mulai saat kondisinya false)
 Player basket;  //Declares an object of the type Player
 Lifebar life;  //Declares an object of the type Player
-Fruit rockets[];  //Kita butuh beberapa apel. [] menunjukkan bahwa kita menggunakan array objek.
-int rocket_no= 4;    //Jumlah apel yang tampil dilayar
+Bom rockets[];  //Kita butuh beberapa rocket. [] menunjukkan bahwa kita menggunakan array objek.
+int rocket_no= 3;    //Jumlah rocket yang tampil dilayar
 int score= 0;
 int lifeScore= 400; //lebar lifebar
 
@@ -43,14 +43,15 @@ class Player {
   }
 }
 
-class Fruit {
-  int posx, posy, rad, speed;
+class Bom {
+  int posx, posy, speed, w, h;
   color c;
-  Fruit()
+  Bom()
   {
     posx=(int)random(50, width-50);
     posy=0;
-    rad=20;
+    w=15;
+    h=45;
     speed=(int)random(2, 5);
     c=color(180, 0, 0);
   }
@@ -58,7 +59,7 @@ class Fruit {
   {
     //fill(c);
     //ellipse(posx, posy, rad, rad);
-    image(rocket, posx, posy, rad, rad);
+    image(rocket, posx, posy, w, h);
   }
   void update_pos()
   {
@@ -66,7 +67,7 @@ class Fruit {
   }
   void check_bounds()
   {
-    if (posy>=height)  //Cek jika apel keluar dari layar, setel ulang posisinya dan berikan kecepatan baru.
+    if (posy>=height)  //Cek jika rocket keluar dari layar, setel ulang posisinya dan berikan kecepatan baru.
     {
       reset_pos();
       lifeScore-=20; //Mengurangi lifeScore saat rocket miss
@@ -118,10 +119,10 @@ void setup()
   textFont(font, 16);
   basket=new Player();  //Initialize our object.
   life = new Lifebar();
-  rockets=new Fruit[rocket_no];  
+  rockets=new Bom[rocket_no];  
   for (int i=0;i<rocket_no;i++)  //Initialize each rocket.
   {
-    rockets[i]=new Fruit();
+    rockets[i]=new Bom();
   }
 }
 
@@ -136,7 +137,7 @@ void draw()
     if (!game_over && music.isPlaying()){
       life.display();              //Displays the lifebar.
       basket.display();              //Displays the basket.
-      for (int i=0;i<rocket_no;++i)   //Untuk setiap apel yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
+      for (int i=0;i<rocket_no;++i)   //Untuk setiap rocket yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
         {
         rockets[i].display();
         rockets[i].update_pos();
@@ -197,7 +198,7 @@ void gameWin(){
     }
 }
 
-void check_collision(Fruit temp_rocket) 
+void check_collision(Bom temp_rocket) 
 {
   //cek jika rocket ditangkap player
   if (temp_rocket.posx>basket.posx && temp_rocket.posx < basket.posx+basket.w && temp_rocket.posy>basket.posy-15 && temp_rocket.posy<basket.posy-basket.h/2+30)  
