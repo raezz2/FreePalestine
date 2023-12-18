@@ -25,7 +25,6 @@ int lifeScore= 400; //lebar lifebar
 class Player {
   int posx, posy;  //Posisi player saat ini
   PImage pic;  //player image
-
   int w, h;  //lebar dan tinggi player
   Player()  //constructor. Fungsi ini dipanggil setiap kali objek baru dari kelas Player dibuat.
   {
@@ -88,15 +87,15 @@ class Bom {
     }
   }
   void reset_pos()
-  {
-    posy=0;
-    posx=(int)random(50, width-50);
-    speed=(int)random(3, 6);
+    {
+      posy=0;
+      posx=(int)random(50, width-50);
+      speed=(int)random(3, 6);
+    }
   }
-}
-class Lifebar {
-  int posx, posy, h;
-  Lifebar()
+  class Lifebar {
+    int posx, posy, h;
+    Lifebar()
   {
     posx= width/2 - lifeScore/2;
     posy= 30;
@@ -154,17 +153,17 @@ void draw()
       
       for (int i=0;i<rocket_no;++i)   //Untuk setiap rocket yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
         {
-        rockets[i].display();
-        rockets[i].update_pos();
-        rockets[i].check_bounds();
-        check_collision(rockets[i]);
-        
-        if (rockets[i].exploded) {
-          rockets[i].explode();
-          rockets[i].play_explosion_sound();  // Memanggil suara ledakan
-          rockets[i].reset_pos();
-          rockets[i].reset_exploded();  // Reset exploded setelah meledak
-        }
+          rockets[i].display();
+          rockets[i].update_pos();
+          rockets[i].check_bounds();
+          check_collision(rockets[i]);
+          
+          if (rockets[i].exploded) {
+            rockets[i].explode();
+            rockets[i].play_explosion_sound();  // Memanggil suara ledakan
+            rockets[i].reset_pos();
+            rockets[i].reset_exploded();  // Reset exploded setelah meledak
+          }
         }
       score_display();
       lifeScore_display();
@@ -173,7 +172,6 @@ void draw()
         gameOver();
     }
   }
-    
 }
 
 void menu(){
@@ -191,6 +189,7 @@ void menu(){
       music.play();
   }
 }
+
 void gameOver(){
   music.stop();
   image(bgGameover, 0, 0);
@@ -224,6 +223,7 @@ void score_display() //menampilkan score
   text("rocket Point : "+score, 5, height-5);
   noFill();
 }
+
 void lifeScore_display() //menampilkan lifescore
 {
   fill(#FAFAFA);
