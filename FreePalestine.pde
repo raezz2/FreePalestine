@@ -3,13 +3,13 @@ import processing.sound.*;
 SoundFile hit;
 SoundFile music;
 SoundFile lose;
+
 //image
 PImage efek;
 PImage bg;
 PImage lifebar;
 PImage rocket;
 PImage bgGameover;
-PImage bgWin;
 PImage button;
 PFont font;    //font yang digunakan
 boolean game_over=false; //game over jika kondisinya true
@@ -29,7 +29,6 @@ class Player {
   int w, h;  //lebar dan tinggi player
   Player()  //constructor. Fungsi ini dipanggil setiap kali objek baru dari kelas Player dibuat.
   {
-    pic=loadImage("catcher.png");
     w=85;
     h=65;
     posx=mouseX-w/2;
@@ -46,6 +45,7 @@ class Player {
 class Bom {
   int posx, posy, speed, w, h;
   color c;
+  boolean exploded;
   Bom()
   {
     posx=(int)random(50, width-50);
@@ -54,6 +54,18 @@ class Bom {
     h=45;
     speed=(int)random(2, 5);
     c=color(180, 0, 0);
+    exploded = false;
+  }
+  void explode() {
+    // Tambahkan logika ledakan di sini
+    // Misalnya, setel gambar atau efek ledakan
+    image(efek, posx - 25, posy - 35, 70, 70);
+  }
+  void play_explosion_sound() {
+    hit.play();
+  }
+  void reset_exploded() {
+    exploded = false;
   }
   void display()
   {
@@ -67,10 +79,12 @@ class Bom {
   }
   void check_bounds()
   {
-    if (posy>=height)  //Cek jika rocket keluar dari layar, setel ulang posisinya dan berikan kecepatan baru.
-    {
+      if (posy >= height && !exploded) {
+      explode();
+      lifeScore -= 20;
+      exploded = true;
+    } else if (posy >= height) {
       reset_pos();
-      lifeScore-=20; //Mengurangi lifeScore saat rocket miss
     }
   }
   void reset_pos()
@@ -102,13 +116,12 @@ void setup()
   //load image
   bg = loadImage("menu-background.png");
   bgGameover = loadImage("gameover.png");
-  bgWin = loadImage("win.jpg");
   lifebar = loadImage("lifebar.png");
   rocket = loadImage("rocket.png");
   efek = loadImage("efek.png");
   button= loadImage("start.png");
   // Load the sound file
-  music = new SoundFile(this, "Old Friends.mp3");
+  music = new SoundFile(this, "Imagine.mp3");
   lose = new SoundFile(this, "failsound.mp3");
   hit = new SoundFile(this, "hit.wav");
   
@@ -118,6 +131,7 @@ void setup()
   font=loadFont("font.vlw");
   textFont(font, 16);
   basket=new Player();  //Initialize our object.
+  basket.pic = loadImage("catcher.png");  // Memuat gambar di sini
   life = new Lifebar();
   rockets=new Bom[rocket_no];  
   for (int i=0;i<rocket_no;i++)  //Initialize each rocket.
@@ -137,21 +151,26 @@ void draw()
     if (!game_over && music.isPlaying()){
       life.display();              //Displays the lifebar.
       basket.display();              //Displays the basket.
+      
       for (int i=0;i<rocket_no;++i)   //Untuk setiap rocket yang ada, dijalankan fungsi display, update_pos, check_bounds dan check_collision.
         {
         rockets[i].display();
         rockets[i].update_pos();
         rockets[i].check_bounds();
         check_collision(rockets[i]);
+        
+        if (rockets[i].exploded) {
+          rockets[i].explode();
+          rockets[i].play_explosion_sound();  // Memanggil suara ledakan
+          rockets[i].reset_pos();
+          rockets[i].reset_exploded();  // Reset exploded setelah meledak
+        }
         }
       score_display();
       lifeScore_display();
     }
     else if (game_over){
         gameOver();
-    }
-    else if(!music.isPlaying()){
-        gameWin(); //memang jika musik telah habis/stop
     }
   }
     
@@ -182,33 +201,17 @@ void gameOver(){
     game_over=false;
     }
 }
-void gameWin(){
-  image(bgWin, 0, 0);
-  //tampil score
-  fill(#FAFAFA);
-  textAlign(CENTER);
-  textSize(40);
-  text(" = "+score, 180, 50);
-  noFill();
-  //tampil tombol
-  image(button, 100, 195,200,60);
-  if(mouseX>=100 && mouseX<=100+200 && mouseY>=195&&mouseY<=195+60 && mousePressed){
-    image(button, 270, 185,240,80);
-    menu=true;
-    }
-}
 
 void check_collision(Bom temp_rocket) 
 {
   //cek jika rocket ditangkap player
-  if (temp_rocket.posx>basket.posx && temp_rocket.posx < basket.posx+basket.w && temp_rocket.posy>basket.posy-15 && temp_rocket.posy<basket.posy-basket.h/2+30)  
-  {
-    image(efek, temp_rocket.posx-25, temp_rocket.posy-35, 70, 70);
+  if (temp_rocket.posx > basket.posx && temp_rocket.posx < basket.posx + basket.w && temp_rocket.posy > basket.posy - 15 && temp_rocket.posy < basket.posy - basket.h/2 + 30) {
+    image(efek, temp_rocket.posx - 25, temp_rocket.posy - 35, 70, 70);
     hit.play();
     temp_rocket.reset_pos();
-    score = score +1; //tambah point
-    if(lifeScore>0 && lifeScore<400){
-    lifeScore = lifeScore +5; //tambah lifescore
+    score = score + 1; // tambah point
+    if (lifeScore > 0 && lifeScore < 400) {
+      lifeScore = lifeScore + 5; // tambah lifescore
     }
   }
 }
